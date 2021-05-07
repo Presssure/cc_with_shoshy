@@ -1,0 +1,35 @@
+{%extends "public_template.html"%}
+
+{%block title %}sign up{%endblock%}
+
+{%block main%}
+
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Profile</h1>
+      <hr>
+        <div class="card">
+          <h4>User</h4>
+            <div class="card-body">
+                <p><strong>{{user['username']}}</strong></p>
+            </div>
+        </div>
+        <hr>
+        
+
+{%with messages= get_flashed_messages()%}
+  {% if messages%}
+    {%for msg in messages%}
+      <p>{{msg}}</p>
+    {%endfor%}
+  {%endif%}
+{%endwith%}
+      </div>
+    </div>
+  </div>
+
+
+
+{%endblock%}
