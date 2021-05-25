@@ -49,7 +49,6 @@ def get_login(email, dynamodb=None):
     else:
         return response.get('Item')
 
-
 @app.route("/")
 def index():
     print("hello")
