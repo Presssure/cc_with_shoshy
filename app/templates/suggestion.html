@@ -1,0 +1,48 @@
+{% extends "public_template.html" %}
+
+{% block title %} Suggestion {% endblock %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Suggestion</h1>
+            <hr>
+
+            <div class="mb-3">
+
+                <div class="form-group">
+                    <a href='/profile'>{{ user['username'] }}</a>
+
+                    <br>
+                <form action='/upload-post' method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Game</label>
+                        <input class="form-control" type="text" required="required" name="game" placeholder="Enter a game title">
+                    </div>
+                    <br>
+
+                    <div class="form-group">
+                        <label>Number of players</label>
+                        <textarea class="form-control" name="number" cols="30" rows="3"
+                            placeholder="Enter the player range"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description of the game</label>
+                        <textarea class="form-control" name="description" cols="30" rows="3"
+                            placeholder="Enter a description of the game"></textarea>
+                    </div>
+                   
+                    <br>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

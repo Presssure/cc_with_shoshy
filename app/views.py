@@ -116,3 +116,36 @@ def profile():
     else:
         print("Username not found in session")
         return redirect(url_for("sign_in"))
+
+@app.route("/forum", methods=["GET", "POST"])
+def forum():
+    user=None
+    if session.get("USERNAME", None) is not None:
+        username=session.get("USERNAME")
+        email=session.get("EMAIL")
+        user=get_login(email)
+        return render_template("forum.html", user=user)
+    else:
+        print("Username not found in session")
+        return redirect(url_for("sign_in"))
+
+@app.route("/suggestion", methods=["GET", "POST"])
+def suggestion():
+    user=None
+    # URL="https://jdlzgl06s9.execute-api.us-east-1.amazonaws.com/my-function"
+    URL="https://mva5kr1vbd.execute-api.us-east-1.amazonaws.com/RDSQuery"
+    headers={"Content-Type": "application/json"}
+    params={"qs": "somevalue"}
+    payload={"payload": "Shoshy"}
+    if session.get("USERNAME", None) is not None:
+        username=session.get("USERNAME")
+        email=session.get("EMAIL")
+        user=get_login(email)
+        r=requests.request("GET", URL, params=params, headers=headers)
+        # r=requests.request("POST", URL, headers=headers, data=payload)
+        print(r.text)
+        return render_template("suggestion.html", user=user)
+    else:
+        print("Username not found in session")
+        return redirect(url_for("sign_in"))
+
