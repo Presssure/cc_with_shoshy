@@ -22,7 +22,26 @@ import requests
 from boto3.dynamodb.conditions import Key, Attr
 
 import os
+
+import pymysql
 app.secret_key="uruKZqxipteEP5_KiRerSQ"
+
+endpoint = 'cc-a3-jenny-database.clf9aoosavui.us-east-1.rds.amazonaws.com'
+username = 'root'
+password = 'password'
+database_name = 'cc_a3_database'
+
+connection = pymysql.connect(host=endpoint, user=username, password=password, database=database_name)
+
+def find_all_game():
+    cursor = connection.cursor()
+    cursor.execute('SELECT `name` from `game`')
+    rows = cursor.fetchall()
+    ret=[]
+    for row in rows:
+        ret.append(row[0])
+    return ret
+
 
 def put_login(email, password, username, dynamodb=None):
     if not dynamodb:
@@ -119,11 +138,25 @@ def profile():
 @app.route("/forum", methods=["GET", "POST"])
 def forum():
     user=None
+    URL="https://jdlzgl06s9.execute-api.us-east-1.amazonaws.com/my-function"
+    # URL="https://mva5kr1vbd.execute-api.us-east-1.amazonaws.com/RDSQuery"
+    
     if session.get("USERNAME", None) is not None:
         username=session.get("USERNAME")
         email=session.get("EMAIL")
         user=get_login(email)
-        return render_template("forum.html", user=user)
+        games=find_all_game()
+        if request.method =="POST":
+            game=request.form["game"]
+            subject=request.form["subject"]
+            message=request.form["message"]
+            params={"qs": "somevalue"}
+            headers={"Content-Type": "application/json"}
+            payload={"game": game, "subject":subject, "message":message}
+            r=requests.post(URL, headers=headers, data=payload)
+            # r=requests.request("GET", URL, params=params, headers=headers)
+            print(r.text)
+        return render_template("forum.html", user=user, games=games)
     else:
         print("Username not found in session")
         return redirect(url_for("sign_in"))
