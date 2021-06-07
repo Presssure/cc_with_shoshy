@@ -23,12 +23,14 @@ from boto3.dynamodb.conditions import Key, Attr
 
 import os
 
+import re
+
 import pymysql
 app.secret_key="uruKZqxipteEP5_KiRerSQ"
 
-endpoint = 'cc-a3-jenny-database.clf9aoosavui.us-east-1.rds.amazonaws.com'
-username = 'root'
-password = 'password'
+endpoint = 'jenny-database.clf9aoosavui.us-east-1.rds.amazonaws.com'
+username = 'jenny'
+password = 'blackpink'
 database_name = 'cc_a3_database'
 
 connection = pymysql.connect(host=endpoint, user=username, password=password, database=database_name)
@@ -68,6 +70,17 @@ def get_login(email, dynamodb=None):
     else:
         return response.get('Item')
 
+def get_login_api(email):
+    URL="https://s7p7uz3gv2.execute-api.us-east-1.amazonaws.com/test/email/"
+    params={"qs": "somevalue"}
+    headers={"Content-Type": "application/json"}
+    r=requests.get(URL+email, headers=headers)
+    s=r.text
+    s=s[1:-1]
+    m=json.loads(s)
+    # print(m["name"])
+    return m
+
 @app.route("/")
 def index():
     print("hello")
@@ -85,12 +98,14 @@ def sign_in():
         req=request.form
         email=req.get("email")
         password=req.get("password")
-        user=get_login(email)
+        # user=get_login(email)
+        user=get_login_api(email)
         if user != None:
             if user['password']==password:
                 session["USERNAME"]=user["username"]
                 session["EMAIL"]=email
                 print("User added to session")
+                
                 return redirect(url_for("profile"))
             else:
                 flash("email or password is invalid")
