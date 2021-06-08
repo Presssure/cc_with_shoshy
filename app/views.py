@@ -128,14 +128,6 @@ def put_replies(email, reply, id):
     print("put Reply")
     connection.commit()
 
-def upload_file(file_name, object_name=None):
-    if object_name is None:
-        object_name=file_name
-
-    s3_client=boto3.client('s3')
-
-    response=s3_client.upload_file(file_name, "game-info-cc-a3-jenny", object_name)
-
 @app.route("/")
 def index():
     print("hello")
@@ -280,12 +272,9 @@ def admin():
         email=session.get("EMAIL")
         user=get_login(email)
         if request.method=="POST":
-            # r=requests.get()
-            file=request.files["file"]
-            r=requests.get(file, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'})
-            with open("game.json", "wb") as f:
-                f.write(r.content)
-                upload_file("game.json")
+            s3 = boto3.resource('s3')
+
+            s3.Bucket('game-info-cc-a3-jenny').put_object(Key=request.files['file'].filename, Body=request.files['file'])
         return render_template("admin.html", user=user)
 
     else:
