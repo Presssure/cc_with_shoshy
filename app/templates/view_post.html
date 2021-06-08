@@ -1,0 +1,52 @@
+{% extends "public_template.html" %}
+
+{% block title %} View Post {% endblock %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>View Post</h1>
+            <hr>
+
+            <div class="card">
+                <div class="card-body">
+                  <h4> {{ subject }} </h4>
+                  <h4>{{game}}</h4>
+                  <hr>
+                  <p>{{ message }}</p>
+                  <p class="text-muted">Submitted by {{ user[username] }} on {{time}}</p>
+                </div>
+            </div>
+            <form action='/put-reply' method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Reply</label>
+                    <input type="hidden" name="id" value="{{id}}"/>
+                    <textarea class="form-control" name="reply" cols="30" rows="3"
+                            placeholder="Enter your reply"></textarea>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary">Post</button>
+            </form>
+            <hr>
+            <h2>Replies</h2>
+            <br>
+            {%for reply in replies%}
+            <div class="card">
+                <div class="card-body">
+                  <h4> {{ user[username] }} </h4>
+                  <p>{{reply[3]}}</p>
+                  <p class="text-muted">{{reply[4]}}</p>
+                </div>
+                </div>
+                <br>
+            {%endfor%}
+            
+           
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

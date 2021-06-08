@@ -28,7 +28,7 @@ import re
 import pymysql
 app.secret_key="uruKZqxipteEP5_KiRerSQ"
 
-endpoint = 'jenny-database.clf9aoosavui.us-east-1.rds.amazonaws.com'
+endpoint = 'jenny-database-final.clf9aoosavui.us-east-1.rds.amazonaws.com'
 username = 'jenny'
 password = 'blackpink'
 database_name = 'cc_a3_database'
@@ -80,6 +80,54 @@ def get_login_api(email):
     m=json.loads(s)
     # print(m["name"])
     return m
+
+def put_forum(email, game, subject, message):
+    cursor = connection.cursor()
+    time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    cursor.execute(f"INSERT INTO forum_post VALUES ('null', '{subject}', '{message}', '{game}', '{email}', '{time}');")
+
+    connection.commit()
+    print("Done!")
+
+
+
+def get_forum():
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT * from `forum_post` ORDER BY `datetime` DESC')
+
+    rows = cursor.fetchall()
+
+    # for row in rows:
+    #     print(f'{row[0]} {row[1]} {row[2]} {row[3]}')
+    return rows
+
+def get_replies(id):
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT * from `post_reply` ORDER BY `datetime` DESC')
+
+    rows = cursor.fetchall()
+
+    # for row in rows:
+    #     print(f'{row[0]} {row[1]} {row[2]} {row[3]}')
+    return rows
+
+def get_post(id):
+    print(id)
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT * from `forum_post` where `id`='{id}' ORDER BY `datetime` DESC")
+    result = cursor.fetchone()
+    print(result)
+    return result
+
+def put_replies(email, reply, id):
+    cursor = connection.cursor()
+    time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    cursor.execute(f"INSERT INTO post_reply VALUES ('null', '{id}', '{email}','{reply}', '{time}');")
+    print("put Reply")
+    connection.commit()
+
 
 @app.route("/")
 def index():
@@ -153,25 +201,20 @@ def profile():
 @app.route("/forum", methods=["GET", "POST"])
 def forum():
     user=None
-    URL="https://jdlzgl06s9.execute-api.us-east-1.amazonaws.com/my-function"
-    # URL="https://mva5kr1vbd.execute-api.us-east-1.amazonaws.com/RDSQuery"
-    
     if session.get("USERNAME", None) is not None:
         username=session.get("USERNAME")
         email=session.get("EMAIL")
         user=get_login(email)
         games=find_all_game()
+        posts=get_forum()
         if request.method =="POST":
             game=request.form["game"]
             subject=request.form["subject"]
             message=request.form["message"]
-            params={"qs": "somevalue"}
-            headers={"Content-Type": "application/json"}
-            payload={"game": game, "subject":subject, "message":message}
-            r=requests.post(URL, headers=headers, data=payload)
-            # r=requests.request("GET", URL, params=params, headers=headers)
-            print(r.text)
-        return render_template("forum.html", user=user, games=games)
+
+            put_forum(email, game, subject, message)
+            return redirect(request.url)
+        return render_template("forum.html", user=user, games=games, posts=posts)
     else:
         print("Username not found in session")
         return redirect(url_for("sign_in"))
@@ -196,3 +239,49 @@ def suggestion():
         print("Username not found in session")
         return redirect(url_for("sign_in"))
 
+@app.route("/view-post/<post_id>", methods=["GET", "POST"])
+def view_post(post_id):
+    user=None
+    id=post_id
+    print("This is the post id: ",post_id)
+    if session.get("USERNAME", None) is not None:
+        username=session.get("USERNAME")
+        email=session.get("EMAIL")
+        user=get_login(email)
+        if request.method =="POST":
+            post=get_post(post_id)
+            game=post[3]
+            subject=post[1]
+            message=post[2]
+            time=post[5]
+            replies=get_replies(id)
+            return render_template("view_post.html", id=id,user=user, replies=replies, message=message, time=time,subject=subject, game=game)
+        return redirect(request.url)
+    else:
+        print("Username not found in session")
+        return redirect(url_for("sign_in"))
+
+@app.route("/put-reply", methods=["GET","POST"])
+def put_reply():
+    user=None
+    if session.get("USERNAME", None) is not None:
+        username=session.get("USERNAME")
+        email=session.get("EMAIL")
+        user=get_login(email)
+        if request.method =="POST":
+            reply=request.form["reply"]
+            id=request.form["id"]
+            print("post id: ", id)
+            post=get_post(id)
+            print(post)
+            game=post[3]
+            subject=post[1]
+            message=post[2]
+            time=post[5]
+            replies=get_replies(id)
+            put_replies(email, reply, id)
+            print("was here")
+            # return render_template("view_post.html", id=id, time=time, game=game, subject=subject, message=message, user=user, reply=reply, replies=replies)
+    else:
+        print("Username not found in session")
+        return redirect(url_for("sign_in"))

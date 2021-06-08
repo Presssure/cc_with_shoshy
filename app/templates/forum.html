@@ -52,14 +52,15 @@
 
             <div class="card">
                 <div class="card-body">
-                  <h4> {{ post['subject'] }} </h4>
+                  <h4> {{ post[1] }} </h4>
+                  <h4>{{post[3]}}</h4>
                   <hr>
 
-                  <!-- <img src={{ get_post_img(post['img_filename']) }} width="120" height="120"> -->
-        
-                  <p>{{ post['message'] }}</p>
-                  <p class="text-muted">Submitted by {{ post['user_name'] }} on {{ post['datetime'].strftime("%m/%d/%Y, %H:%M:%S") }}</p>
-        
+                  <p>{{ post[2] }}</p>
+                  <p class="text-muted">Submitted by {{ post[4] }} on {{post[5]}}</p>
+                  <form action="/view-post/{{post[0]}}" method="POST">
+                    <button type="submit" class="btn btn-primary">View</button>
+                </form>
                 </div>
               </div>
 
