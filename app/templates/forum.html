@@ -58,9 +58,7 @@
 
                   <p>{{ post[2] }}</p>
                   <p class="text-muted">Submitted by {{ post[4] }} on {{post[5]}}</p>
-                  <form action="/view-post/{{post[0]}}" method="POST">
-                    <button type="submit" class="btn btn-primary">View</button>
-                </form>
+                  <a href='/view-post/{{post[0]}}'>View</a>
                 </div>
               </div>
 

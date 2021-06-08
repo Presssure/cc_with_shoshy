@@ -248,40 +248,43 @@ def view_post(post_id):
         username=session.get("USERNAME")
         email=session.get("EMAIL")
         user=get_login(email)
-        if request.method =="POST":
-            post=get_post(post_id)
-            game=post[3]
-            subject=post[1]
-            message=post[2]
-            time=post[5]
-            replies=get_replies(id)
-            return render_template("view_post.html", id=id,user=user, replies=replies, message=message, time=time,subject=subject, game=game)
-        return redirect(request.url)
+        post=get_post(post_id)
+
+        if request.method == "POST":
+            reply = request.form["reply"]
+            put_replies(email, reply, post_id)
+
+        game=post[3]
+        subject=post[1]
+        message=post[2]
+        time=post[5]
+        replies=get_replies(id)
+        return render_template("view_post.html", id=id,user=user, replies=replies, message=message, time=time,subject=subject, game=game)
     else:
         print("Username not found in session")
         return redirect(url_for("sign_in"))
 
-@app.route("/put-reply", methods=["GET","POST"])
-def put_reply():
-    user=None
-    if session.get("USERNAME", None) is not None:
-        username=session.get("USERNAME")
-        email=session.get("EMAIL")
-        user=get_login(email)
-        if request.method =="POST":
-            reply=request.form["reply"]
-            id=request.form["id"]
-            print("post id: ", id)
-            post=get_post(id)
-            print(post)
-            game=post[3]
-            subject=post[1]
-            message=post[2]
-            time=post[5]
-            replies=get_replies(id)
-            put_replies(email, reply, id)
-            print("was here")
-            # return render_template("view_post.html", id=id, time=time, game=game, subject=subject, message=message, user=user, reply=reply, replies=replies)
-    else:
-        print("Username not found in session")
-        return redirect(url_for("sign_in"))
+# @app.route("/put-reply", methods=["GET","POST"])
+# def put_reply():
+#     user=None
+#     if session.get("USERNAME", None) is not None:
+#         username=session.get("USERNAME")
+#         email=session.get("EMAIL")
+#         user=get_login(email)
+#         if request.method =="POST":
+#             reply=request.form["reply"]
+#             id=request.form["id"]
+#             print("post id: ", id)
+#             post=get_post(id)
+#             print(post)
+#             game=post[3]
+#             subject=post[1]
+#             message=post[2]
+#             time=post[5]
+#             replies=get_replies(id)
+#             put_replies(email, reply, id)
+#             print("was here")
+#             return redirect()
+#     else:
+#         print("Username not found in session")
+#         return redirect(url_for("sign_in"))
