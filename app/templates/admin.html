@@ -8,7 +8,7 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      <h1>Profile</h1>
+      <h1>Admin</h1>
       <hr>
         <div class="card">
           <h4>User</h4>
@@ -17,9 +17,16 @@
             </div>
         </div>
         <hr>
-        {%if user['role']=="admin"%}
-        <a href='/admin'>Admin</a>
-        {%endif%}
+        <form action="/admin"method="POST" enctype="multipart/form-data">
+            <div class="form-group"></div>
+            <label>Select a file</label>
+            <div class="form-group">
+              <input type="file" name="file" id="file" required='required'>
+            </div>
+          </div>
+          <hr>
+        <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
 
 {%with messages= get_flashed_messages()%}
   {% if messages%}
@@ -31,7 +38,4 @@
       </div>
     </div>
   </div>
-
-
-
 {%endblock%}

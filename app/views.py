@@ -128,6 +128,13 @@ def put_replies(email, reply, id):
     print("put Reply")
     connection.commit()
 
+def upload_file(file_name, object_name=None):
+    if object_name is None:
+        object_name=file_name
+
+    s3_client=boto3.client('s3')
+
+    response=s3_client.upload_file(file_name, "game-info-cc-a3-jenny", object_name)
 
 @app.route("/")
 def index():
@@ -193,6 +200,7 @@ def profile():
         username=session.get("USERNAME")
         email=session.get("EMAIL")
         user=get_login(email)
+        print(user)
         return render_template("profile.html", user=user)
     else:
         print("Username not found in session")
@@ -263,6 +271,27 @@ def view_post(post_id):
     else:
         print("Username not found in session")
         return redirect(url_for("sign_in"))
+
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    user=None
+    if session.get("USERNAME", None) is not None:
+        email=session.get("EMAIL")
+        user=get_login(email)
+        if request.method=="POST":
+            # r=requests.get()
+            file=request.files["file"]
+            r=requests.get(file, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'})
+            with open("game.json", "wb") as f:
+                f.write(r.content)
+                upload_file("game.json")
+        return render_template("admin.html", user=user)
+
+    else:
+            print("Username not found in session")
+            return redirect(url_for("sign_in"))
+
 
 # @app.route("/put-reply", methods=["GET","POST"])
 # def put_reply():
