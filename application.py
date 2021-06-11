@@ -1,6 +1,4 @@
-from app import app
-
-from flask import render_template, request, redirect, jsonify, make_response, session, url_for, flash
+from flask import Flask, render_template, request, redirect, jsonify, make_response, session, url_for, flash
 
 from datetime import datetime
 
@@ -26,6 +24,8 @@ import os
 import re
 
 import pymysql
+
+application = app = Flask(__name__)
 app.secret_key="uruKZqxipteEP5_KiRerSQ"
 
 endpoint = 'jenny-database-final.clf9aoosavui.us-east-1.rds.amazonaws.com'
@@ -301,27 +301,5 @@ def admin():
             return redirect(url_for("sign_in"))
 
 
-# @app.route("/put-reply", methods=["GET","POST"])
-# def put_reply():
-#     user=None
-#     if session.get("USERNAME", None) is not None:
-#         username=session.get("USERNAME")
-#         email=session.get("EMAIL")
-#         user=get_login(email)
-#         if request.method =="POST":
-#             reply=request.form["reply"]
-#             id=request.form["id"]
-#             print("post id: ", id)
-#             post=get_post(id)
-#             print(post)
-#             game=post[3]
-#             subject=post[1]
-#             message=post[2]
-#             time=post[5]
-#             replies=get_replies(id)
-#             put_replies(email, reply, id)
-#             print("was here")
-#             return redirect()
-#     else:
-#         print("Username not found in session")
-#         return redirect(url_for("sign_in"))
+if __name__ == "__main__":
+    app.run()
