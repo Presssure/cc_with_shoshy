@@ -35,6 +35,8 @@ database_name = 'cc_a3_database'
 
 connection = pymysql.connect(host=endpoint, user=username, password=password, database=database_name)
 
+
+
 def find_all_game():
     cursor = connection.cursor()
     cursor.execute('SELECT `name` from `game`')
@@ -57,6 +59,14 @@ def put_login(email, password, username, dynamodb=None):
             }
     )
     return response
+
+def put_login_rds(email, username, password):
+    cursor = connection.cursor()
+
+    cursor.execute(f"INSERT INTO user VALUES ('{email}', '{username}', '{password}');")
+
+    connection.commit()
+
 
 def get_login(email, dynamodb=None):
     if not dynamodb:
@@ -128,6 +138,14 @@ def put_replies(email, reply, id):
     print("put Reply")
     connection.commit()
 
+
+def clever_function(input):
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT * from `game` where `name`='{input}'")
+    result = cursor.fetchone()
+    return result[2]
+app.jinja_env.globals.update(clever_function=clever_function)
+
 @app.route("/")
 def index():
     print("hello")
@@ -175,6 +193,7 @@ def sign_up():
             isUnique=False
             flash("The email already exists")
         else:
+            put_login_rds(email, username, password)
             put_login(email, password, username)
             return redirect(url_for("sign_in"))
     return render_template("sign_up.html")
@@ -192,7 +211,7 @@ def profile():
         username=session.get("USERNAME")
         email=session.get("EMAIL")
         user=get_login(email)
-        print(user)
+        # print(user)
         return render_template("profile.html", user=user)
     else:
         print("Username not found in session")
@@ -207,11 +226,12 @@ def forum():
         user=get_login(email)
         games=find_all_game()
         posts=get_forum()
+        img=[]
+
         if request.method =="POST":
             game=request.form["game"]
             subject=request.form["subject"]
             message=request.form["message"]
-
             put_forum(email, game, subject, message)
             return redirect(request.url)
         return render_template("forum.html", user=user, games=games, posts=posts)
@@ -273,7 +293,6 @@ def admin():
         user=get_login(email)
         if request.method=="POST":
             s3 = boto3.resource('s3')
-
             s3.Bucket('game-info-cc-a3-jenny').put_object(Key=request.files['file'].filename, Body=request.files['file'])
         return render_template("admin.html", user=user)
 
