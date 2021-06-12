@@ -14,13 +14,15 @@
                 <br>
                 <form action='/forum' method="POST" enctype="multipart/form-data">
                     <div class="form-group">
-                    <label for="exampleDataList" class="form-label">Game</label>
-                    <input class="form-control" list="datalistOptions" name="game" id="game" placeholder="Type to search...">
-                    <datalist id="datalistOptions">
+                    <!-- <label for="exampleDataList" class="form-label">Game</label> -->
+                    <!-- <input class="form-control" list="datalistOptions" name="game" id="game" placeholder="Type to search..."> -->
+                    <label for="game">Choose a game: </label>
+                    <select name="game" id="game">
+                    <!-- <option selected>Please select a game</option> -->
                     {% for name in games %}
-                    <option value="{{name}}">
+                    <option  value="{{name}}" >{{name}}</option>
                     {% endfor %}
-                    </datalist>
+                    </select>
                     </div>
                     <br>
                 
@@ -47,7 +49,16 @@
             <hr>
 
             <br>
-
+            <form action='/selection' method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <select name="selection" id="selection">
+                    {% for name in games%}
+                        <option value="{{name}}">{{name}}</option>
+                    {%endfor%}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+            </form>
             {% for post in posts %}
 
             <div class="card">

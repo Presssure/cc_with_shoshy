@@ -112,6 +112,14 @@ def get_forum():
     #     print(f'{row[0]} {row[1]} {row[2]} {row[3]}')
     return rows
 
+def get_specific_forum(game):
+    cursor=connection.cursor()
+    cursor.execute(f"SELECT * from `forum_post` where `game_name`='{game}' ORDER BY `datetime` DESC")
+    result=cursor.fetchall()
+    for row in result:
+        print(f'{row[0]} {row[1]} {row[2]} {row[3]}')
+    return result
+
 def get_replies(id):
     cursor = connection.cursor()
 
@@ -124,7 +132,6 @@ def get_replies(id):
     return rows
 
 def get_post(id):
-    print(id)
     cursor = connection.cursor()
     cursor.execute(f"SELECT * from `forum_post` where `id`='{id}' ORDER BY `datetime` DESC")
     result = cursor.fetchone()
@@ -226,7 +233,6 @@ def forum():
         user=get_login(email)
         games=find_all_game()
         posts=get_forum()
-        img=[]
 
         if request.method =="POST":
             game=request.form["game"]
@@ -234,6 +240,21 @@ def forum():
             message=request.form["message"]
             put_forum(email, game, subject, message)
             return redirect(request.url)
+        return render_template("forum.html", user=user, games=games, posts=posts)
+    else:
+        print("Username not found in session")
+        return redirect(url_for("sign_in"))
+
+@app.route("/selection", methods=["GET", "POST"])
+def selection():
+    user=None
+    if session.get("USERNAME", None) is not None:
+        email=session.get("EMAIL")
+        user=get_login(email)
+        games=find_all_game()
+        posts=get_forum()
+        game=request.form["selection"]
+        posts=get_specific_forum(game)
         return render_template("forum.html", user=user, games=games, posts=posts)
     else:
         print("Username not found in session")
@@ -302,4 +323,4 @@ def admin():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug='True')
