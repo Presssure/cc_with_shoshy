@@ -55,7 +55,8 @@ def put_login(email, password, username, dynamodb=None):
         Item={
             'email': email,
             'password': password,
-            'username': username
+            'username': username,
+            'role':"regular"
             }
     )
     return response
@@ -294,13 +295,14 @@ def view_post(post_id):
         if request.method == "POST":
             reply = request.form["reply"]
             put_replies(email, reply, post_id)
-
+        print(post[2])
         game=post[3]
         subject=post[1]
         message=post[2]
         time=post[5]
+        name=post[4]
         replies=get_replies(id)
-        return render_template("view_post.html", id=id,user=user, replies=replies, message=message, time=time,subject=subject, game=game)
+        return render_template("view_post.html", id=id,user=user, replies=replies, message=message, time=time,subject=subject, game=game, name=name)
     else:
         print("Username not found in session")
         return redirect(url_for("sign_in"))

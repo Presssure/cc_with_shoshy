@@ -16,7 +16,7 @@
                   <h4>{{game}}</h4>
                   <hr>
                   <p>{{ message }}</p>
-                  <p class="text-muted">Submitted by {{ user[username] }} on {{time}}</p>
+                  <p class="text-muted">Submitted by {{ name }} on {{time}}</p>
                 </div>
             </div>
             <form action='/view-post/{{id}}' method="POST" enctype="multipart/form-data">
@@ -35,7 +35,7 @@
             {%for reply in replies%}
             <div class="card">
                 <div class="card-body">
-                  <h4> {{ user[username] }} </h4>
+                  <h4> {{ reply[2] }} </h4>
                   <p>{{reply[3]}}</p>
                   <p class="text-muted">{{reply[4]}}</p>
                 </div>
